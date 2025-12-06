@@ -20,5 +20,5 @@ def error_400(request, exception):
 def coming_soon(request):
     return render(request, 'errors/soon.html')
 
-def prayer_times(request):
-    return render(request, 'pages/prayer_times.html')
+def prayer(request):
+    return render(request, 'pages/prayer.html')
