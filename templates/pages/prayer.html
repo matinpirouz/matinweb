@@ -7,8 +7,6 @@
   اوقات شرعی
 {% endblock %}
 
-
-
 {% block content %}
   <div class="row md-3">
     <div class="col-12 col-md-6 p-3">
@@ -38,6 +36,16 @@
       </div>
     </div>
   </div>
+  <div id="prayerTimes"></div>
+  <div class="loading" id="loading" style="display: none;">
+    <div class="loading-icon"></div>
+    <p>در حال دریافت اطلاعات</p>
+  </div>
+  <footer>
+    <p>
+      منبع: <a href="https://prayer.aviny.com">https://prayer.aviny.com</a>
+    </p>
+  </footer>
   <div class="row md-1">
     <div class="col-12 col-md-6 col-lg-4 p-3">
       <div class="card h-100">
@@ -91,4 +99,42 @@
       </div>
     </div>
   </div>
+{% endblock %}
+{% block script %}
+  <script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const citySelector = document.getElementById('city');
+    const prayerTimesDiv = document.getElementById('prayerTimes');
+//      const lastUpdated = document.getElementById('lastUpdated');
+    const loadingDiv = document.getElementById('loading');
+
+    const savedCityCode = getCookie('cityCode');
+    if (savedCityCode) {
+        citySelector.value = savedCityCode;
+        fetchPrayerTimes(savedCityCode);
+    } else {
+        // Initial fetch for Tehran (default city)
+        fetchPrayerTimes('1');
+    }
+
+    citySelector.addEventListener('change', function () {
+      const cityCode = this.value;
+      setCookie('cityCode', cityCode, 30); // Save city code in cookies for 30 days
+      fetchPrayerTimes(cityCode);
+  });
+
+  function fetchPrayerTimes(cityCode) {
+    showLoading(true);
+    fetch(`https://prayer.aviny.com/api/prayertimes/${cityCode}`)
+        .then(response => response.json())
+        .then(data => {
+            showLoading(false);
+            updatePrayerTimes(data, cityCode);
+        })
+        .catch(error => {
+            showLoading(false);
+            showError();
+        });
+}
+</script>
 {% endblock %}
