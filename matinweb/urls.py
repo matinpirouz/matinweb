@@ -21,6 +21,8 @@ from main import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('main.urls')),
+    path('account/', include('account.urls')),
+    path('api/', include('api.urls'))
 ]
 
 handler404 = 'main.views.error_404'
