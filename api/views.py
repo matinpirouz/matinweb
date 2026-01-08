@@ -20,6 +20,36 @@ def register_view(request):
     first_name = request.POST.get("first_name")
     phone_number = request.POST.get("phone_number")
 
+    # ======================
+    # آپدیت از سمت ربات بله
+    # ======================
+    if token and user_id:
+        try:
+            bale_token = BaleToken.objects.get(
+                token=token,
+                expiration_date__gt=now
+            )
+            bale_token.bale_id = user_id
+            bale_token.first_name = first_name
+            bale_token.save()
+
+            return JsonResponse({"ok": True})
+        except BaleToken.DoesNotExist:
+            return JsonResponse({"ok": False, "error": "Token not found"}, status=404)
+    
+    if user_id and phone_number:
+        try:
+            bale_token = BaleToken.objects.get(
+                bale_id=user_id,
+                expiration_date__gt=now
+            )
+            bale_token.phone_number = phone_number
+            bale_token.save()
+
+            return JsonResponse({"ok": True})
+        except BaleToken.DoesNotExist:
+            return JsonResponse({"ok": False, "error": "User_id not found"}, status=404)
+        
     if not device_id:
         return JsonResponse({"ok": False, "error": "device_id is required"}, status=400)
 
@@ -46,25 +76,7 @@ def register_view(request):
             return JsonResponse({"ok": False, "error": "Invalid or expired token"}, status=404)
 
     # ======================
-    # 2. آپدیت از سمت ربات بله
-    # ======================
-    if token and user_id:
-        try:
-            bale_token = BaleToken.objects.get(
-                token=token,
-                expiration_date__gt=now
-            )
-            bale_token.bale_id = user_id
-            bale_token.first_name = first_name
-            bale_token.phone_number = phone_number
-            bale_token.save()
-
-            return JsonResponse({"ok": True})
-        except BaleToken.DoesNotExist:
-            return JsonResponse({"ok": False, "error": "Token not found"}, status=404)
-
-    # ======================
-    # 3. درخواست توکن جدید
+    # 2. درخواست توکن جدید
     # ======================
     existing = BaleToken.objects.filter(
         device_identifier=device_id,
