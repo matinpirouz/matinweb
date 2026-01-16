@@ -5,9 +5,21 @@
 
 {% block content %}
   <div class="row">
+    {% if request.user.is_staff %}
+    <div class="col-12 col-md-6 col-lg-4 p-3">
+      <div class="card card-hover h-100">
+        <div class="card-body">
+          <h5 class="card-title">صدور فاکتور</h5>
+          <p class="card-text">صدور فاکتور به صورت برخط</p>
+          <a href="{% url "VIP:create_invoice" %}" class="stretched-link">
+          </a>
+        </div>
+      </div>
+    </div>
+    {% endif %}
     {% for page in pages %}
       <div class="col-12 col-md-6 col-lg-4 p-3">
-        <div class="card card-hover h-100">
+        <div class="card card-hover h-100 {% if page.page_url == 'main:coming_soon' %}coming-soon{% endif %}">
           <div class="card-body">
             <h5 class="card-title">{{ page.name }}</h5>
             <p class="card-text">{{ page.description }}</p>

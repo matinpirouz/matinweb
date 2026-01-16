@@ -1,10 +1,13 @@
 from django.db import models
 from django.utils import timezone
 from datetime import timedelta
+from django.contrib.auth.models import User
 
 
 class BaleAccount(models.Model):
-    user_id = models.CharField(max_length=255, unique=True)
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE
+    )
     bale_id = models.CharField(max_length=255, unique=True)
     phone_number = models.CharField(max_length=20, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)

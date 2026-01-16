@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  صدور فاکتور
+{% endblock %}
+{% block header %}
+  صدور فاکتور
+{% endblock %}
+
+{% block content %}
+  <form method="post" action="{% url 'VIP:create_invoice' %}" class="d-flex justify-content-center align-items-center text-center" style="flex-direction:column ;">
+    {% csrf_token %}
+    <div class="row">
+      <div class="col p-3">
+        <input class="form-control text-center" name="shop_name" value="هُلو تفلون" required /><br />
+        <input class="form-control text-center" name="invoice_type" value="فاکتور فروش" required /><br />
+      </div>
+    </div>
+    <hr />
+    <div class="row">
+      <div class="col p-3">
+        <label>نام مشتری:</label><br />
+        <input class="form-control" name="customer_name" id="customer_name" required /><br />
+      </div>
+      <div class="col p-3">
+        <label for="invoice_number">شماره فاکتور:</label><br />
+        <input class="form-control" name="invoice_number" id="invoice_number" /><br />
+
+        <label for="date">تاریخ:</label><br />
+        <input class="form-control" name="date" id="date" required /><br />
+
+        <label for="shop_phone_number">شماره موبایل صاحب فروشگاه:</label><br />
+        <input class="form-control" name="shop_phone_number" id="shop_phone_number" value="09123023406" required /><br />
+      </div>
+    </div>
+    <hr />
+    <div class="row">
+      <div class="col p-3">
+        <label for="name">نام کالا:</label><br />
+        <input class="form-control" id="name" /><br />
+      </div>
+      <div class="col p-3">
+        <label for="size">سایز:</label><br />
+        <input class="form-control" id="size" type="number" oninput="updatePrice()" /><br />
+      </div>
+      <div class="col p-3">
+        <label for="type">نوع خدمات:</label><br />
+        <input class="form-control" id="type" value="بیرون رنگ و داخل گرانیت" /><br />
+      </div>
+      <div class="col p-3">
+        <label for="qty">تعداد:</label><br />
+        <input class="form-control" id="qty" value="1" type="number" oninput="updatePrice()" /><br />
+      </div>
+      <div class="col p-3">
+        <label for="one_price">بهای واحد (ریال):</label><br />
+        <input class="form-control" id="one_price" value="125000" type="number" oninput="updatePrice()" /><br />
+      </div>
+      <div class="col p-3">
+        <label for="price">مبلغ کل (ریال):</label><br />
+        <input class="form-control" id="price" value="125000" type="number" disabled /><br />
+      </div>
+    </div>
+    <a class="btn btn-primary" onclick="add_item()">ثبت کالا</a>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th scope="col">ردیف</th>
+          <th scope="col">نام کالا</th>
+          <th scope="col">سایز</th>
+          <th scope="col">نوع خدمات</th>
+          <th scope="col">تعداد</th>
+          <th scope="col">بهای واحد</th>
+          <th scope="col">مبلغ کل</th>
+          <th scope="col">ویرایش</th>
+          <th scope="col">حذف</th>
+        </tr>
+      </thead>
+      <tbody id="tableTbody"></tbody>
+    </table>
+    <div class="row">
+      <div class="col p-3">
+        <label for="discription">توضیحات (زیر 70 کارکتر):</label><br />
+        <input class="form-control" name="discription" id="discription" type="text" /><br />
+      </div>
+    </div>
+    <input name="items" id="items" hidden required />
+    <button class="btn btn-primary" type="submit">دریافت PDF فاکتور</button>
+  </form>
+{% endblock %}
+
+{% block script %}
+  <script>
+    var items = []
+    
+    const name = document.getElementById('name')
+    const size = document.getElementById('size')
+    const type = document.getElementById('type')
+    const qty = document.getElementById('qty')
+    const one_price = document.getElementById('one_price')
+    const tableTbody = document.getElementById('tableTbody')
+    
+    function add_item() {
+      let item = { name: name.value, size: size.value, type: type.value, qty: qty.value, one_price: one_price.value, price: document.getElementById('price').value }
+      console.log(item)
+    
+      items.push(item)
+      console.log(items)
+    
+      tableTbody.innerHTML = ''
+    
+      for (i = 0; i < items.length; i++) {
+        tableTbody.innerHTML += '<tr><th scope="row">' + (i + 1) + '</th><td>' + items[i]['name'] + '</td><td>' + items[i]['size'] + '</td><td>' + items[i]['type'] + '</td><td>' + items[i]['qty'] + '</td><td>' + items[i]['one_price'] + '</td><td>' + items[i]['price'] + '</td><td>' + 'به‌زودی' + '</td><td>' + 'به‌زودی' + '</td></tr>'
+      }
+    
+      var sendItems = '['
+      for (i = 0; i < items.length; i++) {
+        sendItems += '{"name": "' + items[i]['name'] + '", "size": "' + items[i]['size'] + '", "type": "' + items[i]['type'] + '", "qty": "' + items[i]['qty'] + '", "one_price": "' + items[i]['one_price'] + '"}'
+        if (i < items.length - 1) {
+          sendItems += ','
+        }
+      }
+    
+      document.getElementById('items').value = sendItems + ']'
+      console.log(document.getElementById('items').value)
+    
+      name.value = ''
+      size.value = ''
+      type.value = 'بیرون رنگ و داخل گرانیت'
+      qty.value = 1
+      one_price.value = 125000
+      document.getElementById('price').value = updatePrice()
+    }
+    
+    function updatePrice() {
+      var price = qty.value * one_price.value
+      if (size.value) {
+        price *= size.value
+      }
+    
+      document.getElementById('price').value = price
+    
+      return price
+    }
+  </script>
+{% endblock %}

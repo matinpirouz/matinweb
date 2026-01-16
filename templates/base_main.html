@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="fa">
   <head>
@@ -9,14 +10,16 @@
       {% endblock %}- متین وب
     </title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&display=swap" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     <style>
+      @font-face {
+        font-family: 'Vazir';
+        src: url({% static '/fonts/Vazir.ttf' %}) format('truetype');
+      }
+
       * {
-        font-family: Vazirmatn;
+        font-family: Vazir;
         direction: rtl;
       }
       
@@ -94,7 +97,7 @@
       }
 
 /* ---------- COMING SOON BUTTON ---------- */
-button.coming-soon {
+.coming-soon {
   background: #6b7280 !important; /* خاکستری */
   color: #fff !important;
   cursor: not-allowed;
@@ -105,14 +108,14 @@ button.coming-soon {
 }
 
 /* ---------- لغو تمام افکت های hover بوت‌استرپ ---------- */
-button.coming-soon:hover {
+.coming-soon:hover {
   background: #6b7280 !important;
   transform: none !important;
   box-shadow: none !important;
 }
 
 /* ---------- COMING SOON BADGE ---------- */
-button.coming-soon::after {
+.coming-soon::after {
   content: "به‌زودی";
   position: absolute;
   top: -8px;
@@ -156,6 +159,7 @@ button.coming-soon::after {
           متین وب
         {% endblock %}
       </h1>
+      {% include "messages.html" %}
       {% block content %}
 
       {% endblock %}

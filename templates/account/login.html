@@ -1,0 +1,195 @@
+{% extends 'base_main.html' %}
+
+{% block title %}
+  ورود
+{% endblock %}
+{% block head %}
+  <style>
+    /* ---------- LAYOUT ---------- */
+    #login {
+      display: flex;
+      gap: 8px;
+    }
+    
+    #login,
+    #phoneNumberLoginSection {
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 25px;
+      animation: fadeUp 0.6s ease both;
+    }
+    
+    @media (max-width: 576px) {
+      #login,
+      #phoneNumberLoginSection {
+        padding: 18px;
+      }
+    }
+    
+    /* ---------- BUTTONS ---------- */
+    .btn-primary {
+      background: linear-gradient(135deg, #2563eb, #4f46e5);
+      border: none;
+      border-radius: 14px;
+      padding: 12px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(37, 99, 235, 0.4);
+    }
+    
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    
+    /* ---------- TOKEN CARD ---------- */
+    .token-card {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 16px;
+      background: rgba(0, 0, 0, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-direction: row;
+      gap: 10px;
+      animation: animate__animated animate__fadeIn;
+    }
+    
+    pre {
+      margin: 0;
+      font-family: var(--bs-font-monospace);
+      font-size: 0.95rem;
+      max-width: 400px;
+      color: #e5e7eb;
+      word-break: break-all;
+    }
+    
+    /* ---------- COPY BUTTON ---------- */
+    .copy-btn {
+      background: rgba(37, 99, 235, 0.9);
+      border-radius: 12px;
+      padding: 8px 10px;
+      transition: all 0.25s ease;
+    }
+    
+    .copy-btn:hover {
+      background: #1d4ed8;
+      transform: scale(1.05);
+    }
+    
+    /* ---------- SPINNER ---------- */
+    .spinner-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 10px;
+      animation: pulse 1.8s infinite;
+    }
+    
+    .spinner-border {
+      color: #93c5fd;
+    }
+    
+    /* ---------- WAITING TEXT ---------- */
+    #waitingText {
+      font-size: 1rem;
+      opacity: 0.85;
+      animation: animate__animated animate__fadeIn animate__delay-1s;
+    }
+    
+    /* ---------- TIMER ---------- */
+    .timer {
+      margin-top: 15px;
+      font-weight: 500;
+      color: #93c5fd;
+      text-align: center;
+      animation: animate__animated animate__fadeInUp;
+    }
+    
+    /* ---------- USER INFO ---------- */
+    #userInfoCard {
+      margin-top: 20px;
+      background: rgba(37, 99, 235, 0.15);
+      border: 1px solid rgba(37, 99, 235, 0.4);
+      border-radius: 16px;
+      padding: 15px;
+      animation: animate__animated animate__zoomIn;
+    }
+    
+    /* ---------- BADGE ---------- */
+    .badge {
+      font-size: 0.65rem;
+      padding: 4px 6px;
+    }
+    
+    /* ---------- ANIMATIONS ---------- */
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(25px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    @keyframes pulse {
+      0% {
+        opacity: 0.6;
+      }
+      50% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0.6;
+      }
+    }
+  </style>
+{% endblock %}
+
+{% block header %}
+  ورود
+{% endblock %}
+{% block content %}
+  <div id="login" class="card">
+    <button id="phoneNumberLoginBtn" class="btn btn-primary" onclick="phoneNumberLogin()">ورود با شماره موبایل</button>
+    <button class="btn btn-primary coming-soon" type="button">ورود از طریق گوگل</button>
+    <hr />
+    <p>
+      هنوز ثبت نام نکردید؟ <a href="{% url 'account:register' %}">ثبت نام کنید</a>
+    </p>
+  </div>
+  <div id="phoneNumberLoginSection" style="display:none;" class="card-nohover">
+    <!-- ورود -->
+    <div class="text-center mt-3" id="phoneNumberSection">
+      <form id="loginForm" method="post" action="{% url 'account:login' %}">
+        {% csrf_token %}
+        <div class="form-floating">
+          <input name="username" type="text" class="form-control" id="floatingPassword" placeholder="شماره موبایل" required />
+          <label for="floatingPassword">شماره موبایل</label>
+        </div>
+        <div class="form-floating">
+          <input name="password" type="password" class="form-control" id="floatingPassword" placeholder="رمز عبور" required />
+          <label for="floatingPassword">رمز عبور</label>
+        </div>
+        <button id="submitBtn" type="submit" class="btn btn-primary w-100 py-2">ورود</button>
+      </form>
+        <button class="btn btn-primary coming-soon" type="button">ورود از طریق بله</button>
+    </div>
+  </div>
+{% endblock %}
+{% block script %}
+  <script>
+    /* ----------  PHONE NUMBER LOGIN ---------- */
+    function phoneNumberLogin() {
+      const btn = document.getElementById('phoneNumberLoginBtn')
+      document.getElementById('login').style.display = 'none'
+      document.getElementById('phoneNumberLoginSection').style.display = 'block'
+    }
+  </script>
+{% endblock %})
