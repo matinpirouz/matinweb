@@ -16,6 +16,8 @@ def create_invoice(request):
             date = request.POST.get("date")
             items = json.loads(request.POST.get("items"))
             discription = request.POST.get("discription")
+            discount = int(request.POST.get("discount", 0)) if request.POST.get("discount") != '' else 0
+            previous_debt = int(request.POST.get("previous_debt", 0)) if request.POST.get("previous_debt") != '' else 0
             
             invoice = create_invoice_pdf(
                 shop_name=shop_name,
@@ -26,6 +28,8 @@ def create_invoice(request):
                 date=date,
                 items=items,
                 discription=discription,
+                discount=discount,
+                previous_debt=previous_debt,
                 filename=f"invoice{invoice_number}.pdf"
             )
             

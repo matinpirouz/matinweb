@@ -46,6 +46,9 @@ def create_invoice_pdf(
     shop_name,
     shop_phone_number,
     invoice_type,
+    discount=0,
+    previous_debt=0
+
     ):
     
     c = canvas.Canvas('media/' + filename, pagesize=portrait(A4))
@@ -54,6 +57,7 @@ def create_invoice_pdf(
 
     width, height = portrait(A4)
     margin = 5 * mm
+    
     
     # اطلاعات مشتری
     customer_info_data = [
@@ -84,8 +88,8 @@ def create_invoice_pdf(
     c.setFont('Vazir', 11)
     table_top = height - margin - 80
     row_height = 25
-    headers = ["ردیف", "نام کالا", "سایز", "نوع خدمات", "تعداد", "بهای واحد", "مبلغ کل"]
-    col_widths = [30, 185, 30, 130, 30, 80, 80]
+    headers = ["ردیف", "نام کالا", "سایز", "نوع خدمات", "تعداد", "مبلغ کل"]
+    col_widths = [30, 240, 35, 140, 35, 85]
 
     x = width - margin
     for i, header in enumerate(headers):
@@ -124,8 +128,8 @@ def create_invoice_pdf(
 
         c.setFillColor(colors.black)
 
-        sum_price = int(item.get("size")) * int(item.get("one_price")) * int(item.get("qty", 1)) if item.get("size") else int(item.get("qty", 1)) * int(item.get("one_price"))
-        total += sum_price
+        price = int(item.get("price", 0)) if item.get("price") != '' else 0
+        total += price
 
         values = [
             en_to_fa_numbers(str(i + 1)),
@@ -133,13 +137,12 @@ def create_invoice_pdf(
             en_to_fa_numbers(str(item.get("size", "-"))),
             rtl_text(item["type"]),
             en_to_fa_numbers(str(item.get('qty'))),
-            en_to_fa_numbers(f"{rtl_text('ریال')} {int(item.get('one_price')):11,}"),
-            en_to_fa_numbers(f"{rtl_text('ریال')} {sum_price:11,}"),
+            en_to_fa_numbers(f"{rtl_text('ریال')} {price:11,}"),
         ]
 
         for j in range(len(col_widths)):
             if i % 2 == 0:
-                c.setFillColorRGB(0.95, 0.95, 0.95)
+                c.setFillColorRGB(0.85, 0.85, 0.85)
             else:
                 c.setFillColor(colors.white)
             c.rect(x - col_widths[j], y, col_widths[j], row_height, stroke=1, fill=1)
@@ -147,11 +150,48 @@ def create_invoice_pdf(
             c.drawCentredString(x - col_widths[j] / 2, y + 7, values[j])
             x -= col_widths[j]
 
-    # جمع کل
+    rows = [("جمع کل", total)]
+
+    if discount > 0:
+        rows.append(("تخفیف", discount))
+
+    if previous_debt > 0:
+        rows.append(("بدهی قبلی", previous_debt))
+
+    payable = total - discount + previous_debt
+    rows.append(("مبلغ قابل پرداخت", payable))
+
+        # جمع کل
+    box_width = 240
+    line_height = 22
+    padding = 10
+
+    box_height = line_height * len(rows) + padding * 2
+
+    box_x = width - margin - box_width
+    box_y = y - 10
+
+    # پس‌زمینه کادر
+    c.setFillColorRGB(0.95, 0.95, 0.95)
+    c.rect(box_x, box_y - box_height, box_width, box_height, stroke=1, fill=1)
+
+    # متن داخل کادر
+    current_y = box_y - padding - 12
     c.setFillColor(colors.black)
-    y -= row_height + 10
-    c.setFont('Vazir', 13)
-    c.drawRightString(width - margin, y + 7, rtl_text(f"جمع کل فاکتور: {en_to_fa_numbers(f'{total:,}')} ریال"))
+
+    for label, value in rows:
+        c.setFont('Vazir', 13)
+
+        c.drawRightString(
+            box_x + box_width - padding,
+            current_y,
+            rtl_text(f"{label}: {en_to_fa_numbers(f'{value:,}')} ریال")
+        )
+
+        current_y -= line_height
+
+    y = box_y - box_height - 20
+
     if discription != '':
         c.drawRightString(width - margin, y - 23, rtl_text("توضیحات: " + discription))
     else:

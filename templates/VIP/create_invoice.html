@@ -13,14 +13,14 @@
     <div class="row">
       <div class="col p-3">
         <input class="form-control text-center" name="shop_name" value="هُلو تفلون" required /><br />
-        <input class="form-control text-center" name="invoice_type" value="فاکتور فروش" required /><br />
+        <input class="form-control text-center" name="invoice_type" value="پیش فاکتور" required /><br />
       </div>
     </div>
     <hr />
     <div class="row">
       <div class="col p-3">
         <label>نام مشتری:</label><br />
-        <input class="form-control" name="customer_name" id="customer_name" required /><br />
+        <input class="form-control" name="customer_name" id="customer_name" required autofocus /><br />
       </div>
       <div class="col p-3">
         <label for="invoice_number">شماره فاکتور:</label><br />
@@ -37,7 +37,13 @@
     <div class="row">
       <div class="col p-3">
         <label for="name">نام کالا:</label><br />
-        <input class="form-control" id="name" /><br />
+        <input class="form-control" id="name" list="productList" /><br />
+        
+        <datalist id="productList">
+          <option value="قابلمه">
+          <option value="تابه">
+        </datalist>
+        
       </div>
       <div class="col p-3">
         <label for="size">سایز:</label><br />
@@ -45,7 +51,12 @@
       </div>
       <div class="col p-3">
         <label for="type">نوع خدمات:</label><br />
-        <input class="form-control" id="type" value="بیرون رنگ و داخل گرانیت" /><br />
+        <input class="form-control" id="type" list="typeList" value="بیرون رنگ و داخل گرانیت" /><br />
+
+        <datalist id="typeList">
+          <option value="دو رو گرانیت">
+        </datalist>
+        
       </div>
       <div class="col p-3">
         <label for="qty">تعداد:</label><br />
@@ -57,7 +68,7 @@
       </div>
       <div class="col p-3">
         <label for="price">مبلغ کل (ریال):</label><br />
-        <input class="form-control" id="price" value="125000" type="number" disabled /><br />
+        <input class="form-control" id="price" value="125000" type="number" /><br />
       </div>
     </div>
     <a class="btn btn-primary" onclick="add_item()">ثبت کالا</a>
@@ -80,7 +91,17 @@
     <div class="row">
       <div class="col p-3">
         <label for="discription">توضیحات (زیر 70 کارکتر):</label><br />
-        <input class="form-control" name="discription" id="discription" type="text" /><br />
+        <textarea class="form-control" name="discription" id="discription"></textarea><br />
+      </div>
+    </div>
+    <div class="row">
+      <div class="col p-3">
+        <label for="discount">تخفیف:</label><br />
+        <input class="form-control" name="discount" id="discount" type="number" /><br />
+      </div>
+      <div class="col p-3">
+        <label for="previous_debt">بدهی قبلی:</label><br />
+        <input class="form-control" name="previous_debt" id="previous_debt" type="number" /><br />
       </div>
     </div>
     <input name="items" id="items" hidden required />
@@ -114,7 +135,7 @@
     
       var sendItems = '['
       for (i = 0; i < items.length; i++) {
-        sendItems += '{"name": "' + items[i]['name'] + '", "size": "' + items[i]['size'] + '", "type": "' + items[i]['type'] + '", "qty": "' + items[i]['qty'] + '", "one_price": "' + items[i]['one_price'] + '"}'
+        sendItems += '{"name": "' + items[i]['name'] + '", "size": "' + items[i]['size'] + '", "type": "' + items[i]['type'] + '", "qty": "' + items[i]['qty'] + '", "one_price": "' + items[i]['one_price'] + '", "price": "' + items[i]['price'] + '"}'
         if (i < items.length - 1) {
           sendItems += ','
         }
