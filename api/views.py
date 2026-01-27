@@ -3,6 +3,7 @@ from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from account.models import BaleToken
+from main.models import Province, City
 import secrets
 
 
@@ -108,3 +109,11 @@ def register_view(request):
         "expires_at": expiration,
         "is_new": True
     }, status=201)
+
+
+def cities_by_province(request, province_code):
+    cities = City.objects.filter(
+        province__code=province_code
+    ).values('code', 'name')
+
+    return JsonResponse(list(cities), safe=False)

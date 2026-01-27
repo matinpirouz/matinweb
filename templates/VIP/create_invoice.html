@@ -38,12 +38,17 @@
       <div class="col p-3">
         <label for="name">نام کالا:</label><br />
         <input class="form-control" id="name" list="productList" /><br />
-        
+
         <datalist id="productList">
-          <option value="قابلمه">
-          <option value="تابه">
+          <option value="قابلمه" />
+          <option value="تابه" />
+          <option value="تابه تک دسته" />
+          <option value="تابه دو دسته" />
+          <option value="تابه چدن تک دسته" />
+          <option value="تابه چدن دو دسته" />
+          <option value="قابلمه چدن" />
+          <option value="شیرجوش" />
         </datalist>
-        
       </div>
       <div class="col p-3">
         <label for="size">سایز:</label><br />
@@ -51,12 +56,14 @@
       </div>
       <div class="col p-3">
         <label for="type">نوع خدمات:</label><br />
-        <input class="form-control" id="type" list="typeList" value="بیرون رنگ و داخل گرانیت" /><br />
+        <input class="form-control" id="type" list="typeList" value="بیرون رنگ و داخل گرانیت" oninput="updateOnePrice()" /><br />
 
         <datalist id="typeList">
-          <option value="دو رو گرانیت">
+          <option value="بیرون رنگ و داخل گرانیت" />
+          <option value="دو رو گرانیت" />
+          <option value="بیرون رنگ" />
+          <option value="داخل گرانیت" />
         </datalist>
-        
       </div>
       <div class="col p-3">
         <label for="qty">تعداد:</label><br />
@@ -125,12 +132,28 @@
       console.log(item)
     
       items.push(item)
-      console.log(items)
     
+      update_items_table()
+      name.value = ''
+      size.value = ''
+      type.value = 'بیرون رنگ و داخل گرانیت'
+      qty.value = 1
+      one_price.value = 125000
+      document.getElementById('price').value = updatePrice()
+    }
+    
+    function delete_item(item_id) {
+      items.splice(item_id, 1)
+      console.log(item_id)
+      console.log(items)
+      update_items_table()
+    }
+    
+    function update_items_table() {
       tableTbody.innerHTML = ''
     
       for (i = 0; i < items.length; i++) {
-        tableTbody.innerHTML += '<tr><th scope="row">' + (i + 1) + '</th><td>' + items[i]['name'] + '</td><td>' + items[i]['size'] + '</td><td>' + items[i]['type'] + '</td><td>' + items[i]['qty'] + '</td><td>' + items[i]['one_price'] + '</td><td>' + items[i]['price'] + '</td><td>' + 'به‌زودی' + '</td><td>' + 'به‌زودی' + '</td></tr>'
+        tableTbody.innerHTML += '<tr><th scope="row">' + (i + 1) + '</th><td>' + items[i]['name'] + '</td><td>' + items[i]['size'] + '</td><td>' + items[i]['type'] + '</td><td>' + items[i]['qty'] + '</td><td>' + items[i]['one_price'] + '</td><td>' + items[i]['price'] + '</td><td>' + 'به‌زودی' + '</td><td><a onclick="delete_item(' + i + ')">حذف آخرین</td></tr>'
       }
     
       var sendItems = '['
@@ -142,14 +165,6 @@
       }
     
       document.getElementById('items').value = sendItems + ']'
-      console.log(document.getElementById('items').value)
-    
-      name.value = ''
-      size.value = ''
-      type.value = 'بیرون رنگ و داخل گرانیت'
-      qty.value = 1
-      one_price.value = 125000
-      document.getElementById('price').value = updatePrice()
     }
     
     function updatePrice() {
@@ -161,6 +176,16 @@
       document.getElementById('price').value = price
     
       return price
+    }
+    
+    function updateOnePrice() {
+      if (type.value == 'بیرون رنگ و داخل گرانیت') {
+        one_price.value = 125000
+      } else if (type.value == 'دو رو گرانیت') {
+        one_price.value = 170000
+      } else {
+        one_price.value = ''
+      }
     }
   </script>
 {% endblock %}

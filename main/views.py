@@ -1,8 +1,8 @@
 from django.shortcuts import render
-from .models import page
+from .models import Page, Province
 
 def home(request):
-    pages = page.objects.all()
+    pages = Page.objects.all()
     return render(request, 'index.html', {'pages': pages})
 
 def error_404(request, exception):
@@ -21,4 +21,5 @@ def coming_soon(request):
     return render(request, 'errors/soon.html')
 
 def prayer(request):
-    return render(request, 'pages/prayer.html')
+    provinces = Province.objects.all()
+    return render(request, 'pages/prayer.html', {'provinces': provinces})

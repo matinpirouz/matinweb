@@ -159,7 +159,9 @@ def create_invoice_pdf(
         rows.append(("بدهی قبلی", previous_debt))
 
     payable = total - discount + previous_debt
-    rows.append(("مبلغ قابل پرداخت", payable))
+    
+    if previous_debt > 0 and discount > 0:
+        rows.append(("مبلغ قابل پرداخت", payable))
 
         # جمع کل
     box_width = 240
