@@ -156,7 +156,7 @@
         fetch(`http://prayer.aviny.com/api/prayertimes/${cityCode}`)
           .then((res) => res.json())
           .then((data) => {
-            updatePrayerTimes(data)
+//            updatePrayerTimes(data)
           })
       }
     
@@ -164,11 +164,11 @@
                      شروع اولیه صفحه
                   =============================== */
     
-      const savedCityCode = getCookie('cityCode')
+/*      const savedCityCode = getCookie('cityCode')
       if (savedCityCode) {
         citySelect.value = savedCityCode
         fetchPrayerTimes(savedCityCode)
-      }
+      }*/
     
       // لود شهرهای استان پیش‌فرض
     })

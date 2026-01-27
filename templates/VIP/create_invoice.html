@@ -6,6 +6,54 @@
 {% block header %}
   صدور فاکتور
 {% endblock %}
+{% block style %}
+<style>
+  /* خروج ردیف قدیمی */
+  @keyframes slideOutEdit {
+    to {
+      transform: translateX(120px);
+      opacity: 0;
+    }
+  }
+
+
+  /* ورود ردیف جدید */
+  @keyframes fadeInUpSoft {
+    from {
+      transform: translateY(12px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  .row-edit-exit {
+    animation: slideOutEdit 0.35s ease forwards;
+  }
+  
+  .row-edit-enter {
+    animation: fadeInUpSoft 0.35s ease, highlightRow 1.2s ease;
+  }
+  
+  @keyframes highlightRow {
+    0% { background-color: #ffff99; }
+    100% { background-color: transparent; }
+  }
+  
+  
+  .row-delete-exit {
+    animation: slideOutEdit 0.35s ease forwards;
+  }
+  
+
+  .btn-add { background-color: #0d6efd; color: white; }
+.btn-cancel { background-color: #f8f9fa; color: #333; border: 1px solid #ccc; }
+.btn-add:hover { background-color: #0b5ed7; }
+.btn-cancel:hover { background-color: #e2e6ea; }
+
+</style>
+{% endblock %}
 
 {% block content %}
   <form method="post" action="{% url 'VIP:create_invoice' %}" class="d-flex justify-content-center align-items-center text-center" style="flex-direction:column ;">
@@ -78,8 +126,11 @@
         <input class="form-control" id="price" value="125000" type="number" /><br />
       </div>
     </div>
-    <a class="btn btn-primary" onclick="add_item()">ثبت کالا</a>
-    <table class="table table-striped">
+    <div class="d-flex gap-2 mt-3">
+      <a class="btn btn-primary btn-add flex-fill" onclick="add_item()">ثبت کالا</a>
+      <a class="btn btn-cancel flex-fill d-none" onclick="cancel_edit()">انصراف</a>
+    </div>
+        <table class="table table-striped">
       <thead>
         <tr>
           <th scope="col">ردیف</th>
@@ -101,6 +152,13 @@
         <textarea class="form-control" name="discription" id="discription"></textarea><br />
       </div>
     </div>
+    <div class="row mt-2">
+      <div class="col p-3 text-end">
+        <strong>جمع فاکتور: </strong>
+        <span id="total_price">0</span> ریال
+      </div>
+    </div>
+    
     <div class="row">
       <div class="col p-3">
         <label for="discount">تخفیف:</label><br />
@@ -119,6 +177,9 @@
 {% block script %}
   <script>
     var items = []
+    var isDeleting = false
+    let editIndex = null
+    let isEditing = false
     
     const name = document.getElementById('name')
     const size = document.getElementById('size')
@@ -128,44 +189,136 @@
     const tableTbody = document.getElementById('tableTbody')
     
     function add_item() {
-      let item = { name: name.value, size: size.value, type: type.value, qty: qty.value, one_price: one_price.value, price: document.getElementById('price').value }
-      console.log(item)
+      const newItem = {
+        name: name.value,
+        size: size.value,
+        type: type.value,
+        qty: qty.value,
+        one_price: one_price.value,
+        price: document.getElementById('price').value
+      }
     
-      items.push(item)
+      // حالت ویرایش
+      if (isEditing && editIndex !== null) {
+        const row = tableTbody.children[editIndex]
+        if (!row) return
     
-      update_items_table()
+        // خروج مقدار قدیمی
+        row.classList.add('row-edit-exit')
+    
+        setTimeout(() => {
+          items[editIndex] = newItem
+          update_items_table(editIndex)
+          cancel_edit() // ⬅️ اینجا درست است
+        }, 350)
+    
+        return
+      }
+    
+      // افزودن عادی
+      items.push(newItem)
+      update_items_table(items.length - 1)
+      reset_form()
+    }
+    
+    
+    
+
+    function reset_form() {
       name.value = ''
       size.value = ''
       type.value = 'بیرون رنگ و داخل گرانیت'
       qty.value = 1
       one_price.value = 125000
-      document.getElementById('price').value = updatePrice()
+      updatePrice()
     }
     
-    function delete_item(item_id) {
-      items.splice(item_id, 1)
-      console.log(item_id)
-      console.log(items)
-      update_items_table()
+    
+    function edit_item(index) {
+      if (isEditing) { showMessage('شما در حال ویرایش کالای دیگری هستید'); return; }
+    
+      const item = items[index]
+    
+      name.value = item.name
+      size.value = item.size
+      type.value = item.type
+      qty.value = item.qty
+      one_price.value = item.one_price
+      document.getElementById('price').value = item.price
+    
+      editIndex = index
+      isEditing = true
+    
+      document.querySelector('.btn-add').innerText = 'ذخیره تغییرات'
+      document.querySelector('.btn-cancel').classList.remove('d-none')
+    
+      name.focus()
     }
     
-    function update_items_table() {
-      tableTbody.innerHTML = ''
+
+    function cancel_edit() {
+      reset_form()
+      editIndex = null
+      isEditing = false
     
-      for (i = 0; i < items.length; i++) {
-        tableTbody.innerHTML += '<tr><th scope="row">' + (i + 1) + '</th><td>' + items[i]['name'] + '</td><td>' + items[i]['size'] + '</td><td>' + items[i]['type'] + '</td><td>' + items[i]['qty'] + '</td><td>' + items[i]['one_price'] + '</td><td>' + items[i]['price'] + '</td><td>' + 'به‌زودی' + '</td><td><a onclick="delete_item(' + i + ')">حذف آخرین</td></tr>'
-      }
-    
-      var sendItems = '['
-      for (i = 0; i < items.length; i++) {
-        sendItems += '{"name": "' + items[i]['name'] + '", "size": "' + items[i]['size'] + '", "type": "' + items[i]['type'] + '", "qty": "' + items[i]['qty'] + '", "one_price": "' + items[i]['one_price'] + '", "price": "' + items[i]['price'] + '"}'
-        if (i < items.length - 1) {
-          sendItems += ','
-        }
-      }
-    
-      document.getElementById('items').value = sendItems + ']'
+      document.querySelector('.btn-add').innerText = 'ثبت کالا'
+      document.querySelector('.btn-cancel').classList.add('d-none')
     }
+    
+    
+    function delete_item(el, index) {
+      const row = el.closest('tr')
+    
+      row.classList.add('row-delete-exit')
+    
+      setTimeout(() => {
+        items.splice(index, 1)
+        update_items_table()
+      }, 350)
+    }
+    
+    
+    
+    function update_items_table(editedIndex = null) {
+      let rows = ''
+    
+      items.forEach((item, i) => {
+        const cls = editedIndex === i ? 'row-edit-enter' : ''
+    
+        rows += `
+          <tr class="${cls}">
+            <th>${i + 1}</th>
+            <td>${item.name}</td>
+            <td>${item.size}</td>
+            <td>${item.type}</td>
+            <td>${item.qty}</td>
+            <td>${item.one_price}</td>
+            <td>${item.price}</td>
+            <td>
+              <a href="javascript:void(0)" onclick="edit_item(${i})">ویرایش</a>
+            </td>
+            <td>
+              <a href="javascript:void(0)" onclick="delete_item(this, ${i})">حذف</a>
+            </td>
+          </tr>
+        `
+      })
+    
+      tableTbody.innerHTML = rows
+      document.getElementById('items').value =
+      JSON.stringify(items)
+    // محاسبه جمع کل
+let total = 0
+items.forEach(it => {
+  total += Number(it.price)
+})
+document.getElementById('total_price').innerText = total.toLocaleString() // جداکننده هزارگان
+
+
+    }
+    
+    
+    
     
     function updatePrice() {
       var price = qty.value * one_price.value

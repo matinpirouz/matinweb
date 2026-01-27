@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect
 from .create_invoice import create_invoice_pdf
 import json
+from decouple import config, Csv
+import requests
 
-
-
+url_send_invoice = f'https://tapi.bale.ai/bot{config("BALE_HOLOO_TEFLON_BOT_TOKEN")}/sendDocument'
 
 def create_invoice(request):
     if request.user.is_staff:
@@ -32,7 +33,15 @@ def create_invoice(request):
                 previous_debt=previous_debt,
                 filename=f"invoice{invoice_number}.pdf"
             )
-            
+            try:
+                payload = {
+                    'chat_id': 1687820101,
+                    'document': f"{config('SITE_URL')}invoice{invoice_number}.pdf",
+                    'caption': f"فاکتور {invoice_number}"
+                }
+                requests.post(url_send_invoice, data=payload, timeout=10)
+            except Exception as e:
+                print(e)
             return redirect(f'/media/invoice{invoice_number}.pdf')
         else:
             
