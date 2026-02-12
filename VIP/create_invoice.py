@@ -1,3 +1,6 @@
+import os
+from io import BytesIO
+from django.conf import settings
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import portrait, A4
 from reportlab.pdfbase import pdfmetrics
@@ -51,8 +54,9 @@ def create_invoice_pdf(
 
     ):
     
-    c = canvas.Canvas('media/' + filename, pagesize=portrait(A4))
-    pdfmetrics.registerFont(TTFont('Vazir', 'Vazir.ttf'))
+    buffer = BytesIO()
+    c = canvas.Canvas(buffer, pagesize=portrait(A4))
+    pdfmetrics.registerFont(TTFont('Vazir', os.path.join(settings.BASE_DIR, 'statics/fonts/Vazir.ttf')))
     c.setFont('Vazir', 14)
 
     width, height = portrait(A4)
@@ -160,7 +164,7 @@ def create_invoice_pdf(
 
     payable = total - discount + previous_debt
     
-    if previous_debt > 0 and discount > 0:
+    if previous_debt > 0 or discount > 0:
         rows.append(("مبلغ قابل پرداخت", payable))
 
         # جمع کل
@@ -204,5 +208,5 @@ def create_invoice_pdf(
     c.drawCentredString(width / 2, y - 53 + (0 if discription else 30), rtl_text(f"خواهشمند است مبلغ فاکتور را به شماره کارت {en_to_fa_numbers('3904-1825-2910-5022')} نزد بانک پاسارگاد به نام"))
     c.drawCentredString(width / 2, y - 83 + (0 if discription else 30), rtl_text(f"مسعود پیروز واریز و رسید آن را برای شماره {en_to_fa_numbers(shop_phone_number)} در پیام‌رسان واتساپ یا بله ارسال نمایید."))
     c.save()
-    
-    return c
+    buffer.seek(0)
+    return buffer

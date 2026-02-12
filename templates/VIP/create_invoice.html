@@ -170,7 +170,11 @@
       </div>
     </div>
     <input name="items" id="items" hidden required />
-    <button class="btn btn-primary" type="submit">دریافت PDF فاکتور</button>
+    <div class="form-check form-switch">
+      <label class="form-check-label" for="switchCheckDefault">دریافت فایل PDF</label>
+      <input class="form-check-input fs-5" type="checkbox" name="download_pdf" role="switch" id="switchCheckDefault">
+    </div>
+    <button class="btn btn-primary mt-3" type="submit">ساخت فاکتور</button>
   </form>
 {% endblock %}
 

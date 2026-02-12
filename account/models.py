@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 
 class BaleAccount(models.Model):
     user = models.ForeignKey(
-        User, on_delete=models.CASCADE
+        User, on_delete=models.CASCADE, related_name='baleaccount'
     )
     bale_id = models.CharField(max_length=255, unique=True)
     phone_number = models.CharField(max_length=20, unique=True)
