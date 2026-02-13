@@ -64,10 +64,12 @@ def create_invoice(request):
                 messages.success(request, "فاکتور با موفقیت ساخته و در بله برای شما ارسال شد.")
             else:
                 messages.success(request, "فاکتور با موفقیت ساخته شد.")
-                messages.error(request, "خطایی در ارسال فاکتور در بله برای شما به وجود آمد.")
+                messages.error(request, "خطایی در ارسال فاکتور در بله برای شما به وجود آمد به همین دلیل فاکتور دانلود شد.")
+                return FileResponse(invoice, as_attachment=False, filename=f"invoice{invoice_number}.pdf")
         except Exception as e:
             print(f"Error: {e}")
-            messages.error(request, "خطایی در ارسال فاکتور در بله برای شما به وجود آمد.")
+            messages.error(request, "خطایی در ارسال فاکتور در بله برای شما به وجود آمد به همین دلیل فاکتور دانلود شد.")
+            return FileResponse(invoice, as_attachment=False, filename=f"invoice{invoice_number}.pdf")
         if download_pdf:
             invoice.seek(0)
             return FileResponse(invoice, as_attachment=False, filename=f"invoice{invoice_number}.pdf")
